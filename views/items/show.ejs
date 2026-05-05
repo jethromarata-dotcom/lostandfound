@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title><%= item.name %> — Lost & Found</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../_nav') %>
+  <main>
+    <a href="/" class="back-link">← Back to browse</a>
+
+    <% if (claimed) { %>
+      <div class="alert alert-success">✅ Your claim has been submitted! The admin and the reporter have been notified.</div>
+    <% } %>
+
+    <div class="item-detail">
+      <!-- Main -->
+      <div class="detail-main">
+        <div class="detail-image">
+          <% if (item.image) { %>
+            <img src="/uploads/<%= item.image %>" alt="<%= item.name %>">
+          <% } else { %>
+            <div class="no-img-lg">📦</div>
+          <% } %>
+        </div>
+        <div class="detail-body">
+          <div class="detail-meta">
+            <span class="badge badge-<%= item.type %>"><%= item.type.toUpperCase() %></span>
+            <span class="badge badge-<%= item.status %>"><%= item.status %></span>
+            <span class="badge badge-cat"><%= item.category %></span>
+          </div>
+          <h1><%= item.name %></h1>
+
+          <div class="detail-grid" style="margin-top:1.25rem">
+            <div class="detail-section">
+              <h3>Location</h3>
+              <p>📍 <%= item.location %></p>
+            </div>
+            <div class="detail-section">
+              <h3>Date <%= item.type === 'lost' ? 'Lost' : 'Found' %></h3>
+              <p>📅 <%= item.dateLostFound.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) %></p>
+            </div>
+            <% if (item.color) { %>
+            <div class="detail-section">
+              <h3>Color</h3>
+              <p>🎨 <%= item.color %></p>
+            </div>
+            <% } %>
+            <div class="detail-section">
+              <h3>Reported By</h3>
+              <p>👤 <%= item.reportedBy.username %></p>
+            </div>
+          </div>
+
+          <div class="detail-section" style="margin-top:1rem">
+            <h3>Description</h3>
+            <p style="line-height:1.7"><%= item.description %></p>
+          </div>
+
+          <% if (item.contactEmail) { %>
+          <div class="detail-section">
+            <h3>Contact</h3>
+            <p>✉️ <%= item.contactEmail %></p>
+          </div>
+          <% } %>
+
+          <!-- Actions -->
+          <div class="detail-actions">
+            <% if (currentUser && (item.reportedBy._id.toString() === currentUser.id || currentUser.role === 'admin')) { %>
+              <a href="/items/<%= item._id %>/edit" class="btn btn-outline">Edit</a>
+              <form action="/items/<%= item._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Delete this item?')">
+                <button type="submit" class="btn btn-danger">Delete</button>
+              </form>
+            <% } else if (currentUser && item.status === 'active' && item.type === 'found') { %>
+              <!-- Claim button — scrolls to claim form -->
+              <a href="#claim-section" class="btn btn-primary">📋 Submit a Claim</a>
+            <% } else if (!currentUser) { %>
+              <a href="/auth/login" class="btn btn-primary">Login to Claim</a>
+            <% } %>
+            <% if (currentUser && currentUser.role === 'admin') { %>
+              <a href="/items/<%= item._id %>/edit" class="btn btn-ghost btn-sm">Admin Edit</a>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="detail-sidebar">
+
+        <!-- QR Code -->
+        <div class="sidebar-card">
+          <h3>🔗 QR Code</h3>
+          <div class="qr-wrapper">
+            <img src="<%= qrCode %>" alt="QR Code" width="160">
+            <p>Scan to view this listing</p>
+            <p class="qr-url"><%= itemUrl %></p>
+          </div>
+        </div>
+
+        <!-- Claim form -->
+        <% if (currentUser && item.status === 'active' && item.type === 'found' && item.reportedBy._id.toString() !== currentUser.id) { %>
+        <div class="sidebar-card" id="claim-section">
+          <h3>📋 Submit a Claim</h3>
+          <% if (userClaim) { %>
+            <div class="already-claimed">
+              ✅ You already submitted a claim for this item.<br>
+              <strong>Status: <%= userClaim.status %></strong>
+            </div>
+          <% } else { %>
+            <form action="/claims" method="POST" class="claim-form">
+              <input type="hidden" name="itemId" value="<%= item._id %>">
+              <div style="margin-bottom:0.75rem">
+                <label>Describe why this is yours *</label>
+                <textarea name="message" required placeholder="Provide details that prove this item belongs to you — serial number, contents, unique markings, where you lost it, etc."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%">Submit Claim</button>
+            </form>
+          <% } %>
+        </div>
+        <% } %>
+
+        <!-- Admin: Claims list -->
+        <% if (currentUser && (currentUser.role === 'admin' || item.reportedBy._id.toString() === currentUser.id)) { %>
+          <% if (claims.length > 0) { %>
+          <div class="sidebar-card">
+            <h3>Claims (<%= claims.length %>)</h3>
+            <% claims.forEach(claim => { %>
+              <div class="claim-item">
+                <div class="claim-item-header">
+                  <div>
+                    <div class="claim-user">👤 <%= claim.claimedBy.username %></div>
+                    <div class="claim-email"><%= claim.claimedBy.email %></div>
+                  </div>
+                  <span class="badge badge-<%= claim.status %>"><%= claim.status %></span>
+                </div>
+                <p class="claim-message">"<%= claim.message %>"</p>
+              </div>
+            <% }) %>
+          </div>
+          <% } %>
+        <% } %>
+
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel — Lost & Found</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../_nav') %>
+  <main>
+    <div class="page-header">
+      <h1>⚙ Admin Panel</h1>
+      <p>Manage claims, items, and users</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-number" style="color:var(--blue)"><%= totalItems %></div><div class="stat-label">Total Items</div></div>
+      <div class="stat-card"><div class="stat-number" style="color:var(--orange)"><%= pendingClaims.length %></div><div class="stat-label">Pending Claims</div></div>
+      <div class="stat-card"><div class="stat-number" style="color:var(--text)"><%= totalUsers %></div><div class="stat-label">Students</div></div>
+      <div class="stat-card"><div class="stat-number" style="color:var(--text-dim)"><%= totalClaims %></div><div class="stat-label">Total Claims</div></div>
+    </div>
+
+    <div style="display:flex;gap:0.6rem;margin-bottom:2rem;flex-wrap:wrap">
+      <a href="/admin/claims" class="btn btn-primary">📋 Manage Claims <%= pendingClaims.length > 0 ? `(${pendingClaims.length} pending)` : '' %></a>
+      <a href="/admin/items" class="btn btn-outline">📦 Manage Items</a>
+      <a href="/admin/users" class="btn btn-outline">👥 View Users</a>
+      <a href="/backup" class="btn btn-ghost">⬇ Backup</a>
+    </div>
+
+    <h2 style="font-family:var(--display);font-size:1.1rem;font-weight:700;margin-bottom:1rem">Pending Claims</h2>
+    <% if (pendingClaims.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-icon">✅</div>
+        <h3>No pending claims</h3>
+        <p>All claims have been reviewed.</p>
+      </div>
+    <% } else { %>
+      <div class="table-card">
+        <table>
+          <thead><tr><th>Item</th><th>Claimed By</th><th>Message</th><th>Date</th><th>Actions</th></tr></thead>
+          <tbody>
+            <% pendingClaims.forEach(claim => { %>
+            <tr>
+              <td><a href="/items/<%= claim.item._id %>" style="color:var(--blue);font-weight:500;text-decoration:none"><%= claim.item.name %></a><br><span class="badge badge-<%= claim.item.type %>"><%= claim.item.type %></span></td>
+              <td><strong><%= claim.claimedBy.username %></strong><br><span style="font-size:0.78rem;color:var(--text-dim)"><%= claim.claimedBy.email %></span></td>
+              <td style="max-width:280px;font-size:0.85rem;color:var(--text-dim)"><%= claim.message.substring(0,120) %><%= claim.message.length>120?'...':'' %></td>
+              <td style="font-size:0.78rem;color:var(--text-dim)"><%= claim.createdAt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) %></td>
+              <td>
+                <div style="display:flex;gap:0.4rem;flex-direction:column">
+                  <form action="/admin/claims/<%= claim._id %>/approve" method="POST">
+                    <input type="hidden" name="adminNote" value="Approved by admin">
+                    <button class="btn btn-success btn-sm" style="width:100%">✓ Approve</button>
+                  </form>
+                  <form action="/admin/claims/<%= claim._id %>/reject" method="POST">
+                    <input type="hidden" name="adminNote" value="Rejected by admin">
+                    <button class="btn btn-danger btn-sm" style="width:100%">✗ Reject</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>

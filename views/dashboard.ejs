@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard — Lost & Found</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <%- include('_nav') %>
+  <main>
+    <div class="page-header">
+      <h1>Dashboard</h1>
+      <p>Live overview of the Lost & Found system</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card stat-lost">
+        <div class="stat-number"><%= totalLost %></div>
+        <div class="stat-label">Lost Items</div>
+      </div>
+      <div class="stat-card stat-found">
+        <div class="stat-number"><%= totalFound %></div>
+        <div class="stat-label">Found Items</div>
+      </div>
+      <div class="stat-card stat-claimed">
+        <div class="stat-number"><%= totalClaimed %></div>
+        <div class="stat-label">Claimed</div>
+      </div>
+      <div class="stat-card stat-resolved">
+        <div class="stat-number"><%= totalResolved %></div>
+        <div class="stat-label">Resolved</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" style="color:var(--text)"><%= totalLost + totalFound %></div>
+        <div class="stat-label">Total Reports</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.75rem">
+      <div class="chart-wrapper">
+        <h2>Items by Category</h2>
+        <canvas id="catChart" style="max-height:260px"></canvas>
+      </div>
+      <div class="chart-wrapper">
+        <h2>Items by Status</h2>
+        <canvas id="statusChart" style="max-height:260px"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent Items -->
+    <h2 class="section-title" style="font-family:var(--display);font-size:1.2rem;font-weight:700;color:var(--text);margin-bottom:0.9rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border)">Recently Reported</h2>
+    <div class="table-card" style="margin-bottom:1.5rem">
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Type</th><th>Category</th><th>Location</th><th>Status</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          <% recent.forEach(item => { %>
+          <tr>
+            <td><a href="/items/<%= item._id %>" style="color:var(--blue);font-weight:500;text-decoration:none"><%= item.name %></a></td>
+            <td><span class="badge badge-<%= item.type %>"><%= item.type %></span></td>
+            <td><span class="badge badge-cat"><%= item.category %></span></td>
+            <td style="color:var(--text-dim);font-size:0.82rem"><%= item.location %></td>
+            <td><span class="badge badge-<%= item.status %>"><%= item.status %></span></td>
+            <td style="color:var(--text-dim);font-size:0.8rem"><%= item.createdAt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+
+    <% if (currentUser) { %>
+    <a href="/backup" class="btn btn-outline">⬇ Download JSON Backup</a>
+    <% } %>
+  </main>
+
+  <script>
+    const catLabels = [<% byCategory.forEach((c,i)=>{%>'<%=c._id%>'<%=i<byCategory.length-1?',':''%><%})%>];
+    const catData   = [<% byCategory.forEach((c,i)=>{%><%=c.count%><%=i<byCategory.length-1?',':''%><%})%>];
+    const statusLabels = [<% byStatus.forEach((s,i)=>{%>'<%=s._id%>'<%=i<byStatus.length-1?',':''%><%})%>];
+    const statusData   = [<% byStatus.forEach((s,i)=>{%><%=s.count%><%=i<byStatus.length-1?',':''%><%})%>];
+
+    const colors = ['#1a4fa0','#1a7a4a','#d97706','#c0392b','#7b3fa0','#0e7490','#b45309','#374151'];
+
+    new Chart(document.getElementById('catChart'), {
+      type: 'bar',
+      data: { labels: catLabels, datasets: [{ data: catData, backgroundColor: colors, borderRadius: 4, borderSkipped: false }] },
+      options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { font: { size: 11 } } }, y: { beginAtZero: true, ticks: { stepSize: 1 } } }, responsive: true }
+    });
+
+    new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: { labels: statusLabels, datasets: [{ data: statusData, backgroundColor: ['#1a4fa0','#d97706','#1a7a4a','#c0392b'], borderWidth: 2 }] },
+      options: { plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } }, responsive: true }
+    });
+  </script>
+</body>
+</html>

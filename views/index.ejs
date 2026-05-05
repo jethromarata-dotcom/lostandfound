@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Lost & Found — University System</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('_nav') %>
+  <main>
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-text">
+        <h1>University Lost & Found</h1>
+        <p>Report lost items, browse found ones, and get your belongings back.</p>
+      </div>
+      <div class="hero-actions">
+        <% if (currentUser) { %>
+          <a href="/items/new" class="btn btn-white">+ Report an Item</a>
+        <% } else { %>
+          <a href="/auth/register" class="btn btn-white">Get Started</a>
+          <a href="/auth/login" class="btn btn-white-outline">Login</a>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-bar">
+      <form class="filter-row" method="GET" action="/">
+        <div class="filter-group" style="flex:2;min-width:200px">
+          <label>Search</label>
+          <input type="text" name="q" value="<%= q %>" placeholder="Item name, location, description...">
+        </div>
+        <div class="filter-group">
+          <label>Type</label>
+          <select name="type">
+            <option value="all" <%= selectedType==='all'?'selected':'' %>>All Items</option>
+            <option value="lost" <%= selectedType==='lost'?'selected':'' %>>Lost</option>
+            <option value="found" <%= selectedType==='found'?'selected':'' %>>Found</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Category</label>
+          <select name="category">
+            <option value="All" <%= selectedCategory==='All'?'selected':'' %>>All Categories</option>
+            <% CATEGORIES.forEach(c => { %><option value="<%= c %>" <%= selectedCategory===c?'selected':'' %>><%= c %></option><% }) %>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Status</label>
+          <select name="status">
+            <option value="All" <%= selectedStatus==='All'?'selected':'' %>>All Status</option>
+            <option value="active" <%= selectedStatus==='active'?'selected':'' %>>Active</option>
+            <option value="claimed" <%= selectedStatus==='claimed'?'selected':'' %>>Claimed</option>
+            <option value="resolved" <%= selectedStatus==='resolved'?'selected':'' %>>Resolved</option>
+          </select>
+        </div>
+        <div class="filter-group" style="justify-content:flex-end;flex-direction:row;gap:0.4rem;min-width:auto">
+          <button type="submit" class="btn btn-primary">Search</button>
+          <% if (q || selectedType!=='all' || selectedCategory!=='All' || selectedStatus!=='All') { %>
+            <a href="/" class="btn btn-ghost">Clear</a>
+          <% } %>
+        </div>
+      </form>
+    </div>
+
+    <div class="toolbar">
+      <span class="count-label"><%= items.length %> item<%= items.length!==1?'s':'' %> found</span>
+      <% if (!currentUser) { %>
+        <a href="/seed" class="btn btn-ghost btn-sm">Load sample data</a>
+      <% } %>
+    </div>
+
+    <!-- Items Grid -->
+    <% if (items.length === 0) { %>
+      <div class="empty-state">
+        <div class="empty-icon">🔎</div>
+        <h3>No items found</h3>
+        <p>Try adjusting your filters or <a href="/items/new">report a new item</a>.</p>
+      </div>
+    <% } else { %>
+      <div class="items-grid">
+        <% items.forEach(item => { %>
+          <a href="/items/<%= item._id %>" class="item-card">
+            <div class="item-card-img">
+              <% if (item.image) { %>
+                <img src="/uploads/<%= item.image %>" alt="<%= item.name %>">
+              <% } else { %>
+                <span class="no-img">📦</span>
+              <% } %>
+            </div>
+            <div class="item-card-body">
+              <div class="item-meta">
+                <span class="badge badge-<%= item.type %>"><%= item.type %></span>
+                <span class="badge badge-<%= item.status %>"><%= item.status %></span>
+                <span class="badge badge-cat"><%= item.category %></span>
+              </div>
+              <h3><%= item.name %></h3>
+              <p><%= item.description %></p>
+            </div>
+            <div class="item-card-footer">
+              <span style="font-size:0.75rem;color:var(--text-dim)">📍 <%= item.location %></span>
+              <span style="font-size:0.72rem;color:var(--text-light)"><%= item.dateLostFound.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) %></span>
+            </div>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<nav>
+  <a href="/" class="nav-logo">
+    <span class="logo-icon">🔍</span>
+    Lost & Found
+  </a>
+  <ul class="nav-links">
+    <li><a href="/">Browse</a></li>
+    <li><a href="/dashboard">Dashboard</a></li>
+    <% if (currentUser) { %>
+      <li><a href="/items/new">+ Report Item</a></li>
+      <% if (currentUser.role === 'admin') { %>
+        <li><a href="/admin">⚙ Admin</a></li>
+      <% } %>
+      <li><span class="nav-user">👤 <%= currentUser.username %></span></li>
+      <li>
+        <form action="/auth/logout" method="POST" style="display:inline">
+          <button type="submit">Logout</button>
+        </form>
+      </li>
+    <% } else { %>
+      <li><a href="/auth/login">Login</a></li>
+      <li><a href="/auth/register">Register</a></li>
+    <% } %>
+    <% if (currentUser) { %>
+      <li><a href="/backup">⬇ Backup</a></li>
+    <% } %>
+  </ul>
+</nav>

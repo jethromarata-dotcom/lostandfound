@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Claims — Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../_nav') %>
+  <main>
+    <a href="/admin" class="back-link">← Admin Panel</a>
+    <div class="page-header"><h1>All Claims</h1></div>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>Item</th><th>Claimant</th><th>Message</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% claims.forEach(claim => { %>
+          <tr>
+            <td><a href="/items/<%= claim.item._id %>" style="color:var(--blue);font-weight:500;text-decoration:none"><%= claim.item.name %></a></td>
+            <td><%= claim.claimedBy.username %><br><span style="font-size:0.75rem;color:var(--text-dim)"><%= claim.claimedBy.email %></span></td>
+            <td style="max-width:240px;font-size:0.83rem;color:var(--text-dim)"><%= claim.message.substring(0,100) %><%= claim.message.length>100?'...':'' %></td>
+            <td><span class="badge badge-<%= claim.status %>"><%= claim.status %></span></td>
+            <td style="font-size:0.78rem;color:var(--text-dim)"><%= claim.createdAt.toLocaleDateString() %></td>
+            <td>
+              <% if (claim.status === 'pending') { %>
+              <div style="display:flex;gap:0.35rem">
+                <form action="/admin/claims/<%= claim._id %>/approve" method="POST">
+                  <input type="hidden" name="adminNote" value="Approved">
+                  <button class="btn btn-success btn-sm">✓</button>
+                </form>
+                <form action="/admin/claims/<%= claim._id %>/reject" method="POST">
+                  <input type="hidden" name="adminNote" value="Rejected">
+                  <button class="btn btn-danger btn-sm">✗</button>
+                </form>
+              </div>
+              <% } else { %>
+                <span style="font-size:0.78rem;color:var(--text-dim)">—</span>
+              <% } %>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

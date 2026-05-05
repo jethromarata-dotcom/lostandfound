@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Items — Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../_nav') %>
+  <main>
+    <a href="/admin" class="back-link">← Admin Panel</a>
+    <div class="page-header"><h1>All Items</h1></div>
+    <div class="table-card">
+      <table>
+        <thead><tr><th>Item</th><th>Type</th><th>Category</th><th>Reporter</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% items.forEach(item => { %>
+          <tr>
+            <td><a href="/items/<%= item._id %>" style="color:var(--blue);font-weight:500;text-decoration:none"><%= item.name %></a></td>
+            <td><span class="badge badge-<%= item.type %>"><%= item.type %></span></td>
+            <td><span class="badge badge-cat"><%= item.category %></span></td>
+            <td style="font-size:0.82rem"><%= item.reportedBy.username %></td>
+            <td><span class="badge badge-<%= item.status %>"><%= item.status %></span></td>
+            <td style="font-size:0.78rem;color:var(--text-dim)"><%= item.createdAt.toLocaleDateString() %></td>
+            <td>
+              <div style="display:flex;gap:0.35rem;flex-wrap:wrap">
+                <a href="/items/<%= item._id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+                <% if (item.status !== 'resolved') { %>
+                <form action="/admin/items/<%= item._id %>/resolve" method="POST">
+                  <button class="btn btn-success btn-sm">Resolve</button>
+                </form>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

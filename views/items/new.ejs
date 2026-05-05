@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Report Item — Lost & Found</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../_nav') %>
+  <main>
+    <a href="/" class="back-link">← Back to browse</a>
+    <div class="page-header">
+      <h1>Report an Item</h1>
+      <p>Fill in the details below to report a lost or found item.</p>
+    </div>
+
+    <% if (error) { %><div class="alert alert-error">⚠ <%= error %></div><% } %>
+
+    <div class="form-card">
+      <form action="/items" method="POST" enctype="multipart/form-data">
+
+        <div class="form-group">
+          <label>Item Type *</label>
+          <div class="type-toggle">
+            <input type="radio" name="type" id="type-lost" value="lost" checked>
+            <label for="type-lost">🔴 I Lost Something</label>
+            <input type="radio" name="type" id="type-found" value="found">
+            <label for="type-found">🟢 I Found Something</label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Item Name *</label>
+            <input type="text" name="name" required placeholder="e.g. Black Samsung Galaxy A54">
+          </div>
+          <div class="form-group">
+            <label>Category *</label>
+            <select name="category" required>
+              <option value="">— Select —</option>
+              <% CATEGORIES.forEach(c => { %><option value="<%= c %>"><%= c %></option><% }) %>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Color</label>
+            <input type="text" name="color" placeholder="e.g. Black, Navy Blue">
+          </div>
+          <div class="form-group">
+            <label>Date Lost / Found *</label>
+            <input type="date" name="dateLostFound" required max="<%= new Date().toISOString().split('T')[0] %>">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Location *</label>
+          <input type="text" name="location" required placeholder="e.g. Library 2nd Floor, Main Canteen, Room 204">
+        </div>
+
+        <div class="form-group">
+          <label>Description *</label>
+          <textarea name="description" required placeholder="Describe the item in detail — brand, markings, contents, condition, anything that helps identify it..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Photo (optional)</label>
+          <input type="file" name="image" accept="image/jpeg,image/png,image/webp">
+          <p class="hint">JPG, PNG or WEBP — max 3MB</p>
+        </div>
+
+        <div class="form-group">
+          <label>Contact Email</label>
+          <input type="email" name="contactEmail" value="<%= currentUser.email %>" placeholder="your@email.com">
+          <p class="hint">So people can reach you directly about this item.</p>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Submit Report</button>
+          <a href="/" class="btn btn-ghost">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
