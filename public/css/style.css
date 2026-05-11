@@ -223,3 +223,37 @@ tr:hover td { background: var(--bg); }
   .hero { padding: 1.5rem; }
   .hero-text h1 { font-size: 1.45rem; }
 }
+
+/* ── DARK MODE VARIABLES ── */
+body.dark {
+  --bg: #0f1117;
+  --bg2: #1a1d27;
+  --bg3: #22263a;
+  --border: #2e3347;
+  --blue-light: #1a2340;
+  --green-light: #0d2318;
+  --red-light: #2a1015;
+  --orange-light: #2a1e08;
+  --text: #e8eaf0;
+  --text-dim: #8b91a8;
+  --text-light: #555c78;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.theme-toggle {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1.1rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.25); }
