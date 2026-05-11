@@ -1,4 +1,4 @@
-# HistoryVault Lost & Found Management System
+# Lost & Found Management System
 ## ITD110 Case Study #1
 
 A web application for managing lost and found items within a university setting. Built with Node.js, Express, MongoDB, and EJS.
